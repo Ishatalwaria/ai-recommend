@@ -1,0 +1,41 @@
+body {
+  background: linear-gradient(to right, #fdfbfb, #ebedee);
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+.btn-primary {
+  background: linear-gradient(45deg, #ff6a00, #ee0979);
+  border: none;
+  transition: all 0.3s ease;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+h3 {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+.list-group-item {
+  border: none;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.2s ease-in-out;
+}
+.list-group-item:hover {
+  background: #fff0f5;
+  transform: translateX(5px);
+}
+.container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
