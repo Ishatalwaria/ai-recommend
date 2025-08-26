@@ -5,6 +5,7 @@ import analyzeRouter from "./routes/analyze.js";
 import spotifyRoutes from "./routes/spotifyRoutes.js";
 import geminiRoutes from "./routes/geminiRoutes.js";
 import huggingfaceRoutes from "./routes/huggingfaceRoutes.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 
 dotenv.config();
@@ -17,13 +18,9 @@ app.use("/analyze-photo", analyzeRouter);
 app.use("/api/spotify", spotifyRoutes);
 app.use("/api/gemini", geminiRoutes);
 app.use("/api/huggingface", huggingfaceRoutes);
- 
 
 // Global error handler
-app.use((err, _req, res, _next) => {
-  console.error("❌ Global Error:", err);
-  res.status(500).json({ error: "Internal Server Error", details: err?.message || "" });
-});
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Backend running on http://localhost:${PORT}`));
