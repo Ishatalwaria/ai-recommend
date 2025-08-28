@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import  {analyzeController}  from '../controllers/analyzeController.js';
-import { getRecommendations } from '../services/spotify.js';
+import { searchTracks } from '../services/spotify.js';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -25,7 +25,7 @@ router.get("/test", (req, res) => {
 // Test Spotify endpoint
 router.get("/test-spotify", async (req, res) => {
   try {
-    const songs = await getRecommendations(["pop"]);
+    const songs = await searchTracks(["pop"]);
     res.json({
       success: true,
       message: "Spotify API is working!",

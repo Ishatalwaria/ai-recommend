@@ -189,7 +189,7 @@ const PhotoUploader = ({ onAnalysisStart, onAnalysisComplete }) => {
         )}
         
         {/* Test Data Button */}
-        <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+        {/*<div style={{ textAlign: 'center', marginTop: '1rem' }}>
           <button
             className="btn-analyze"
             onClick={handleTestData}
@@ -202,7 +202,7 @@ const PhotoUploader = ({ onAnalysisStart, onAnalysisComplete }) => {
           >
             🧪 Test with Sample Data
           </button>
-        </div>
+        </div>*/}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { analyzeBackgroundAndMood } from "../services/huggingface.js";
 import { generateCaptionsAndBios } from "../services/gemini.js";
-import { getRecommendations } from "../services/spotify.js";
+import { searchTracks } from "../services/spotify.js";
 import { mapTagsToMoods, pickSeedGenres } from "../utils/moodMap.js";
 
 export const analyzeController = async (req, res, next) => {
@@ -52,9 +52,9 @@ export const analyzeController = async (req, res, next) => {
       // Convert moods to Spotify-compatible genres
       const seedGenres = pickSeedGenres(moods);
       console.log("🎵 Converting moods to Spotify genres:", moods, "→", seedGenres);
-      
+      const query = seedGenres.join(" ");
       // Get recommendations from Spotify API
-      songs = await getRecommendations(seedGenres);
+      songs = await searchTracks(query);
       console.log("✅ Spotify songs:", songs?.length);
     } catch (err) {
       console.error("❌ Spotify API error:", err.message);
