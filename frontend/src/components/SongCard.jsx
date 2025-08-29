@@ -16,11 +16,10 @@ const SongCard = ({ song, index }) => {
   };
 
   const handleSpotifyClick = () => {
-    if (song.url) {
-      window.open(song.url, '_blank');
+    if (song.external_url) {
+      window.open(song.external_url, '_blank');
     }
   };
-
   return (
     <div 
       className="song-card"
@@ -29,8 +28,8 @@ const SongCard = ({ song, index }) => {
       }}
     >
       <div className="song-image-container">
-        {song.image ? (
-          <img src={song.image} alt={song.name} className="song-image" />
+        {song.album_image ? (
+          <img src={song.album_image} alt={song.name} className="song-image" />
         ) : (
           <div className="song-placeholder">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -83,6 +82,10 @@ const SongCard = ({ song, index }) => {
             {isCopied ? 'Copied!' : 'Copy'}
           </button>
         </div>
+        {/* Optional: Preview snippet */}
+        {song.preview_url && (
+          <audio controls src={song.preview_url} className="song-preview" />
+        )}
       </div>
     </div>
   );

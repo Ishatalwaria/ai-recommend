@@ -15,19 +15,35 @@ export const analyzeController = async (req, res, next) => {
 
     console.log("📸 Received photo:", { mime, size: req.file.size });
 
+    // // Step 1: Hugging Face → detect moods & background
+    // let tags = [];
+    // try {
+    //   tags = await analyzeBackgroundAndMood(req.file.buffer);
+    //   console.log("✅ Hugging Face tags:", tags);
+    // } catch (err) {
+    //   console.error("❌ Hugging Face error:", err.message);
+    //   tags = ["unknown"];
+    // }
+
+    // // Step 2: Map moods
+    // const moods = mapTagsToMoods(tags);
+    // console.log("🎶 Moods:", moods);
     // Step 1: Hugging Face → detect moods & background
-    let tags = [];
+    let moods = [];
+    let background = [];
+    let emotionTags = [];
     try {
-      tags = await analyzeBackgroundAndMood(req.file.buffer);
-      console.log("✅ Hugging Face tags:", tags);
+      const result = await analyzeBackgroundAndMood(req.file.buffer);
+      moods = result.moods || [];
+      background = result.background || [];
+      emotionTags = result.emotionTags || [];
+      console.log("✅ Hugging Face:", { moods, background, emotionTags });
     } catch (err) {
       console.error("❌ Hugging Face error:", err.message);
-      tags = ["unknown"];
+      moods = ["unknown"]; // fallback
+      background = ["unknown"];
+      emotionTags = ["unknown"];
     }
-
-    // Step 2: Map moods
-    const moods = mapTagsToMoods(tags);
-    console.log("🎶 Moods:", moods);
 
     // Step 3: Gemini → captions + bios
     let captions = [], bios = [];
@@ -35,15 +51,16 @@ export const analyzeController = async (req, res, next) => {
       ({ captions, bios } = await generateCaptionsAndBios({
         base64,
         mime,
-        tags,
+        // tags,
+         tags: [...background, ...emotionTags],
         moods,
       }));
       console.log("✅ Gemini response:", { captions, bios });
     } catch (err) {
       console.error("❌ Gemini error:", err.message);
       // Fallback captions and bios based on moods
-      captions = generateFallbackCaptions(moods, tags);
-      bios = generateFallbackBios(moods, tags);
+      captions = generateFallbackCaptions(moods, [...background, ...emotionTags]);
+      bios = generateFallbackBios(moods, [...background, ...emotionTags]);
     }
 
     // Step 4: Get songs from Spotify API based on moods
@@ -61,7 +78,7 @@ export const analyzeController = async (req, res, next) => {
       songs = [];
     }
 
-    return res.json({ tags, moods, captions, bios, songs });
+    return res.json({ moods, background, emotionTags, captions, bios, songs });
   } catch (err) {
     console.error("❌ Unexpected controller error:", err);
     next(err);
