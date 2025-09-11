@@ -1,6 +1,6 @@
 import { analyzeBackgroundAndMood } from "../services/huggingface.js";
 import { generateCaptionsAndBios } from "../services/gemini.js";
-import { searchTracks } from "../services/spotify.js";
+import { searchTracks, getRecommendationsByGenres } from "../services/spotify.js";
 import { mapTagsToMoods, pickSeedGenres } from "../utils/moodMap.js";
 
 export const analyzeController = async (req, res, next) => {
@@ -63,15 +63,19 @@ export const analyzeController = async (req, res, next) => {
       bios = generateFallbackBios(moods, [...background, ...emotionTags]);
     }
 
-    // Step 4: Get songs from Spotify API based on moods
+    // Step 4: Get songs from Spotify API based on moods (prefer Hindi/Bollywood)
     let songs = [];
     try {
       // Convert moods to Spotify-compatible genres
       const seedGenres = pickSeedGenres(moods);
       console.log("🎵 Converting moods to Spotify genres:", moods, "→", seedGenres);
-      const query = seedGenres.join(" ");
-      // Get recommendations from Spotify API
-      songs = await searchTracks(query);
+      if (seedGenres.length > 0) {
+        // Use recommendations endpoint for variety
+        songs = await getRecommendationsByGenres(seedGenres);
+      } else {
+        // Fall back to a Hindi/Bollywood search with randomization
+        songs = await searchTracks("hindi bollywood");
+      }
       console.log("✅ Spotify songs:", songs?.length);
     } catch (err) {
       console.error("❌ Spotify API error:", err.message);

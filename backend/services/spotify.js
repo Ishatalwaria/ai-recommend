@@ -576,14 +576,24 @@ export async function searchTracks(query) {
   try {
     const token = await getAccessToken();
 
+    // Ensure we always have a non-empty query and bias to Hindi results
+    const ensuredQuery = (query && String(query).trim().length > 0)
+      ? `${query} hindi bollywood`
+      : "hindi bollywood";
+
+    // Add a random offset to increase variety across requests
+    const randomOffset = Math.floor(Math.random() * 50);
+
     const response = await axios.get("https://api.spotify.com/v1/search", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
       params: {
-        q: query,
+        q: ensuredQuery,
         type: "track",
         limit: 10,
+        offset: randomOffset,
+        market: "IN", // Prefer Indian catalog for Hindi songs
       },
     });
 
@@ -602,6 +612,57 @@ export async function searchTracks(query) {
   } catch (error) {
     console.error("❌ Error searching Spotify tracks:", error.response?.data || error.message);
     throw new Error("Failed to search Spotify tracks");
+  }
+}
+
+/**
+ * Get recommendations using Spotify's recommendations endpoint based on seed genres.
+ * Uses Indian market and randomizes constraints to get variety.
+ */
+export async function getRecommendationsByGenres(genres = []) {
+  if (!Array.isArray(genres)) genres = [];
+
+  // If no genres provided, fallback to searching Hindi/Bollywood directly
+  if (genres.length === 0) {
+    return searchTracks("hindi bollywood");
+  }
+
+  try {
+    const token = await getAccessToken();
+
+    // De-duplicate, cap to max 5 seed genres per Spotify API
+    const seeds = [...new Set(genres)].slice(0, 5);
+
+    // Add small randomization to popularity to get different tracks
+    const minPopularity = 20 + Math.floor(Math.random() * 60); // 20-79
+
+    const response = await axios.get("https://api.spotify.com/v1/recommendations", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        seed_genres: seeds.join(","),
+        limit: 10,
+        market: "IN",
+        min_popularity: minPopularity,
+      },
+    });
+
+    const tracks = response.data.tracks.map((track) => ({
+      id: track.id,
+      name: track.name,
+      preview_url: track.preview_url,
+      external_url: track.external_urls.spotify,
+      artist: track.artists[0]?.name,
+      album: track.album.name,
+      album_image: track.album.images[0]?.url,
+    }));
+
+    return tracks;
+  } catch (error) {
+    console.error("❌ Error getting Spotify recommendations:", error.response?.data || error.message);
+    // Fallback to search
+    return searchTracks("hindi bollywood");
   }
 }
 
