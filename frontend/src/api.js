@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'https://vibely-ai.onrender.com';
+const API_BASE = import.meta.env.VITE_API_URL ;
 
 export const analyzePhoto = async (formData) => {
   const response = await axios.post(`${API_BASE}/analyze-photo`, formData, {
