@@ -15,20 +15,7 @@ export const analyzeController = async (req, res, next) => {
 
     console.log("📸 Received photo:", { mime, size: req.file.size });
 
-    // // Step 1: Hugging Face → detect moods & background
-    // let tags = [];
-    // try {
-    //   tags = await analyzeBackgroundAndMood(req.file.buffer);
-    //   console.log("✅ Hugging Face tags:", tags);
-    // } catch (err) {
-    //   console.error("❌ Hugging Face error:", err.message);
-    //   tags = ["unknown"];
-    // }
-
-    // // Step 2: Map moods
-    // const moods = mapTagsToMoods(tags);
-    // console.log("🎶 Moods:", moods);
-    // Step 1: Hugging Face → detect moods & background
+   
     let moods = [];
     let background = [];
     let emotionTags = [];
