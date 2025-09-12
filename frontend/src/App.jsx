@@ -49,7 +49,7 @@ function App() {
               </svg>
             </div>
             <h1 className="app-title">
-              <span className="title-main">AI</span>
+              <span className="title-main">Vibely</span>
               <span className="title-sub">Recommend</span>
             </h1>
           </div>
@@ -148,7 +148,7 @@ function App() {
       {/* Footer */}
       <footer className="app-footer">
         <div className="footer-content">
-          <p>Powered by AI • Built with ❤️</p>
+          <p>Vibely • Built with ❤️</p>
         </div>
       </footer>
     </div>
