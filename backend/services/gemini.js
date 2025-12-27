@@ -44,11 +44,11 @@ Return ONLY the JSON object, no additional text.`;
       }
     ];
 
-    console.log("🤖 Calling Gemini API with:", { 
-      hasImage: !!base64, 
-      mime, 
-      tags: tags?.length, 
-      moods: moods?.length 
+    console.log("🤖 Calling Gemini API with:", {
+      hasImage: !!base64,
+      mime,
+      tags: tags?.length,
+      moods: moods?.length
     });
 
     const result = await model.generateContent(parts);
@@ -59,7 +59,7 @@ Return ONLY the JSON object, no additional text.`;
 
     // Extract JSON safely (in case model wraps it in text)
     const json = tryParseJsonFromText(text);
-    
+
     console.log("🤖 Parsed JSON:", json);
 
     return {

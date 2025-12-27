@@ -57,7 +57,7 @@ export async function searchTracks(query) {
       : "hindi bollywood";
 
     // Add a random offset to increase variety across requests
-    const randomOffset = Math.floor(Math.random() * 50);
+    const randomOffset = Math.floor(Math.random() * 100);
 
     const response = await axios.get("https://api.spotify.com/v1/search", {
       headers: {
@@ -120,6 +120,8 @@ export async function getRecommendationsByGenres(genres = []) {
         limit: 10,
         market: "IN",
         min_popularity: minPopularity,
+        target_energy: parseFloat((Math.random() * 0.5 + 0.4).toFixed(1)), // 0.4 - 0.9
+        target_valence: parseFloat((Math.random() * 0.5 + 0.4).toFixed(1)), // 0.4 - 0.9
       },
     });
 

@@ -15,7 +15,7 @@ export const analyzeController = async (req, res, next) => {
 
     console.log("📸 Received photo:", { mime, size: req.file.size });
 
-   
+
     let moods = [];
     let background = [];
     let emotionTags = [];
@@ -27,9 +27,13 @@ export const analyzeController = async (req, res, next) => {
       console.log("✅ Hugging Face:", { moods, background, emotionTags });
     } catch (err) {
       console.error("❌ Hugging Face error:", err.message);
-      moods = ["unknown"]; // fallback
-      background = ["unknown"];
-      emotionTags = ["unknown"];
+      // Pick a random mood to ensure variety even if API fails
+      const fallbackMoods = ["chill", "party", "dance", "romance", "happy", "pop"];
+      const randomMood = fallbackMoods[Math.floor(Math.random() * fallbackMoods.length)];
+      moods = [randomMood];
+      background = ["general"];
+      emotionTags = ["neutral"];
+      console.log("⚠️ Using fallback random mood:", randomMood);
     }
 
     // Step 3: Gemini → captions + bios
@@ -39,7 +43,7 @@ export const analyzeController = async (req, res, next) => {
         base64,
         mime,
         // tags,
-         tags: [...background, ...emotionTags],
+        tags: [...background, ...emotionTags],
         moods,
       }));
       console.log("✅ Gemini response:", { captions, bios });
@@ -72,7 +76,18 @@ export const analyzeController = async (req, res, next) => {
     return res.json({ moods, background, emotionTags, captions, bios, songs });
   } catch (err) {
     console.error("❌ Unexpected controller error:", err);
-    next(err);
+    // CRITICAL FALLBACK: If everything fails, return a safe "Pop" result so the UI doesn't crash
+    const fallbackMoods = ["pop"];
+    const fallbackCaptions = generateFallbackCaptions(fallbackMoods, []);
+    const fallbackBios = generateFallbackBios(fallbackMoods, []);
+    return res.json({
+      moods: fallbackMoods,
+      background: ["general"],
+      emotionTags: ["neutral"],
+      captions: fallbackCaptions,
+      bios: fallbackBios,
+      songs: []
+    });
   }
 };
 
@@ -134,11 +149,28 @@ function generateFallbackCaptions(moods, tags) {
       "Making every day count 💫",
       "Positive energy only ✨",
       "Life is what happens while you're busy living 🌈"
+    ],
+    happy: [
+      "Happiness looks good on me 😄",
+      "Smiling through it all ✨",
+      "Today is a good day ☀️",
+      "Radiating positive energy ⚡",
+      "Choose joy everyday 💛"
+    ],
+    rock: [
+      "Rock on! 🤘",
+      "Living life loud and proud 🎸",
+      "Rebel with a cause ⚡",
+      "Born to be wild 🏍️",
+      "Music is my escape 🎧"
     ]
   };
 
   const primaryMood = moods[0] || "pop";
-  return moodCaptions[primaryMood] || moodCaptions.pop;
+  // specific mood or fallback to pop
+  const selected = moodCaptions[primaryMood] || moodCaptions.pop;
+  // Safe shuffle (copy then sort)
+  return [...selected].sort(() => 0.5 - Math.random());
 }
 
 function generateFallbackBios(moods, tags) {
@@ -182,9 +214,21 @@ function generateFallbackBios(moods, tags) {
       "Living life with passion and purpose ✨",
       "Positive vibes and endless possibilities 🌟",
       "Making every day an adventure 💫"
+    ],
+    happy: [
+      "Spreading smiles and positivity 😄",
+      "Creating my own sunshine ☀️",
+      "Lover of life and happy vibes 💛"
+    ],
+    rock: [
+      "Music, chaos, and everything in between 🤘",
+      "Living on the edge and loving it 🎸",
+      "Not just a phase, it's a lifestyle ⚡"
     ]
   };
 
   const primaryMood = moods[0] || "pop";
-  return moodBios[primaryMood] || moodBios.pop;
+  const selected = moodBios[primaryMood] || moodBios.pop;
+  // Safe shuffle
+  return [...selected].sort(() => 0.5 - Math.random());
 }
